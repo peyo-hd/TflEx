@@ -52,7 +52,7 @@ class MainActivity: Activity() {
             if (nnapiToggle.isChecked) {
                 options.addDelegate(NnApiDelegate())
             } else {
-                options.setNumThreads(2)
+                options.setNumThreads(1)
             }
             tflite = Interpreter(tfliteModel, options)
 
