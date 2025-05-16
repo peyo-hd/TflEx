@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
+        classpath 'com.android.tools.build:gradle:8.8.1'
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10'
     }
 }
@@ -20,10 +20,11 @@ repositories {
 
 android {
     compileSdkVersion 33
+    namespace "com.peyo.tflex"
 
     defaultConfig {
         applicationId "com.peyo.tflex"
-        minSdkVersion 28
+        minSdkVersion 31
         targetSdkVersion 33
     }
 
