@@ -23,15 +23,9 @@ import kotlin.concurrent.thread
 class MainActivity: Activity() {
     companion object {
         private const val TAG = "TFLEx01"
-        private val images = arrayOf("test_image.jpg", "test_image1.jpg",
-                "test_image2.jpg", "test_image3.jpg", "test_image4.jpg",
-                "test_image5.jpg", "test_image.jpg", "test_image1.jpg",
-                "test_image2.jpg", "test_image3.jpg", "test_image4.jpg",
-                "test_image5.jpg", "test_image.jpg", "test_image1.jpg",
-                "test_image2.jpg", "test_image3.jpg", "test_image4.jpg",
-                "test_image5.jpg", "test_image.jpg", "test_image1.jpg",
-                "test_image2.jpg", "test_image3.jpg", "test_image4.jpg",
-                "test_image5.jpg")
+        private val images = arrayOf(
+            "test_hand1.png", "test_hand2.png","test_hand3.png", "test_hand4.png",
+            "test_hand5.png", "test_hand6.png","test_hand7.png", "test_hand8.png")
     }
 
     private lateinit var binding: MainBinding
@@ -40,8 +34,7 @@ class MainActivity: Activity() {
         super.onCreate(savedInstanceState)
         binding = MainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        loadLabels()
-        tfliteModel = FileUtil.loadMappedFile(this, "mobilenet_v1_1_0_224_float.tflite")
+
     }
 
     override fun onDestroy() {
@@ -49,15 +42,27 @@ class MainActivity: Activity() {
         tflite.close()
     }
 
-    fun onComputeClick(v: View) {
+    fun onConv2Click(v: View) {
+        tfliteModel = FileUtil.loadMappedFile(this, "finger_model.tflite")
+        runInference()
+    }
+
+    fun onResnetClick(v: View) {
+        tfliteModel = FileUtil.loadMappedFile(this, "resnet_model.tflite")
+        runInference()
+    }
+
+    fun runInference() {
         thread {
             val options = Interpreter.Options()
-            if (binding.nnapiToggle.isChecked) {
+            if (false) {
                 options.addDelegate(NnApiDelegate())
             } else {
                 options.setNumThreads(1)
             }
             tflite = Interpreter(tfliteModel, options)
+
+            outputs = Array(1) { FloatArray(6) }
 
             inferenceTime = 0
             firstFrame = true
@@ -68,7 +73,7 @@ class MainActivity: Activity() {
                 tflite.run(imgData, outputs)
                 printLabels()
 
-                Thread.sleep(500)
+                Thread.sleep(3000)
             }
 
             runOnUiThread {
@@ -83,8 +88,8 @@ class MainActivity: Activity() {
     private fun printLabels() {
         val runtime = SystemClock.uptimeMillis() - startTime
 
-        for (i in 0 until getNumLabels()) {
-            sortedLabels.add(SimpleEntry(labelList[i], outputs[0][i]))
+        for (i in 0 until 6) {
+            sortedLabels.add(SimpleEntry(i.toString(), outputs[0][i]))
             if (sortedLabels.size > RESULTS_TO_SHOW) {
                 sortedLabels.poll()
             }
@@ -115,22 +120,23 @@ class MainActivity: Activity() {
 
     private lateinit var tfliteModel: MappedByteBuffer
     private var imgData: ByteBuffer? = null
-    private val intValues = IntArray(224 * 224)
+    private val intValues = IntArray(64 * 64)
     private val IMAGE_MEAN = 128.0f
     private val IMAGE_STD = 128.0f
 
     private fun convertBitmapToByteBuffer(bitmap: Bitmap) {
         if (imgData == null) {
             imgData = ByteBuffer.allocateDirect(
-                    1 * 224 * 224 * 3 * 4)
+                    1 * 64 * 64 * 3 * 4)
             imgData!!.order(ByteOrder.nativeOrder())
         }
         imgData!!.rewind()
+
         bitmap.getPixels(intValues, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
 
         var pixel = 0
-        for (i in 0 until 224) {
-            for (j in 0 until 224) {
+        for (i in 0 until 64) {
+            for (j in 0 until 64) {
                 val v: Int = intValues.get(pixel++)
                 imgData!!.putFloat(((v shr 16 and 0xFF) - IMAGE_MEAN) / IMAGE_STD)
                 imgData!!.putFloat(((v shr 8 and 0xFF) - IMAGE_MEAN) / IMAGE_STD)
@@ -145,31 +151,14 @@ class MainActivity: Activity() {
         { o1, o2 -> o1.value.compareTo(o2.value) }
 
     private lateinit var tflite: Interpreter
-    private var labelList = ArrayList<String>()
     private lateinit var outputs: Array<FloatArray>
 
-    private fun loadLabels() {
-        val reader = BufferedReader(InputStreamReader(assets.open("labels.txt")))
-        var line = reader.readLine()
-        while(line != null) {
-            labelList.add(line)
-            line = reader.readLine()
-        }
-        outputs = Array(1) { FloatArray(labelList.size) }
-    }
-
-    private fun getNumLabels(): Int {
-        return labelList.size
-    }
 
     private fun getBitmap(imageName: String): Bitmap {
         val stream = BitmapFactory.decodeStream(assets.open(imageName))
         runOnUiThread {
             binding.imageView.setImageBitmap(Bitmap.createScaledBitmap(stream, 480, 480, true))
         }
-        return Bitmap.createScaledBitmap(stream, 224, 224, true)
-    }
-
-    fun onNNApiClick(v: View) {
+        return Bitmap.createScaledBitmap(stream, 64, 64, true)
     }
 }
