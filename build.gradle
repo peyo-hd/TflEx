@@ -4,14 +4,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10'
+        classpath 'com.android.tools.build:gradle:9.0.1'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.10'
     }
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 repositories {
     google()
@@ -19,12 +18,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
+    namespace "com.peyo.tflex"
 
     defaultConfig {
         applicationId "com.peyo.tflex"
-        minSdkVersion 28
-        targetSdkVersion 33
+        minSdkVersion 31
+        targetSdkVersion 34
     }
 
     sourceSets {
@@ -40,13 +40,19 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
     buildFeatures {
         mlModelBinding true
+        viewBinding true
     }
 }
 
 dependencies {
-    implementation 'org.tensorflow:tensorflow-lite-support:0.4.2'
-    implementation 'org.tensorflow:tensorflow-lite-metadata:0.4.2'
-    implementation 'androidx.annotation:annotation:1.4.0'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.5.0'
+    implementation 'org.tensorflow:tensorflow-lite-metadata:0.5.0'
+    implementation 'androidx.annotation:annotation:1.9.1'
 }

@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
-import kotlinx.android.synthetic.main.main.*
+import com.peyo.tflex.databinding.MainBinding
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.nnapi.NnApiDelegate
 import org.tensorflow.lite.support.common.FileUtil
@@ -34,9 +34,12 @@ class MainActivity: Activity() {
                 "test_image5.jpg")
     }
 
+    private lateinit var binding: MainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main)
+        binding = MainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         loadLabels()
         tfliteModel = FileUtil.loadMappedFile(this, "mobilenet_v1_1_0_224_float.tflite")
     }
@@ -49,7 +52,7 @@ class MainActivity: Activity() {
     fun onComputeClick(v: View) {
         thread {
             val options = Interpreter.Options()
-            if (nnapiToggle.isChecked) {
+            if (binding.nnapiToggle.isChecked) {
                 options.addDelegate(NnApiDelegate())
             } else {
                 options.setNumThreads(1)
@@ -69,9 +72,9 @@ class MainActivity: Activity() {
             }
 
             runOnUiThread {
-                textView1.text = "Summary: \n\t Average Inference time (ms): " +
+                binding.textView1.text = "Summary: \n\t Average Inference time (ms): " +
                         "${inferenceTime / (images.size - 1)}"
-                textView2.text = ""
+                binding.textView2.text = ""
             }
             tflite.close()
         }
@@ -95,14 +98,14 @@ class MainActivity: Activity() {
         text = "Result:" + text
 
         runOnUiThread {
-            textView1.text = "Inference time (ms): " + runtime
+            binding.textView1.text = "Inference time (ms): " + runtime
             if (firstFrame) {
                 firstFrame = false
             } else {
                 inferenceTime += runtime
             }
 
-            textView2.text = text
+            binding.textView2.text = text
         }
     }
 
@@ -162,7 +165,7 @@ class MainActivity: Activity() {
     private fun getBitmap(imageName: String): Bitmap {
         val stream = BitmapFactory.decodeStream(assets.open(imageName))
         runOnUiThread {
-            imageView.setImageBitmap(Bitmap.createScaledBitmap(stream, 480, 480, true))
+            binding.imageView.setImageBitmap(Bitmap.createScaledBitmap(stream, 480, 480, true))
         }
         return Bitmap.createScaledBitmap(stream, 224, 224, true)
     }
