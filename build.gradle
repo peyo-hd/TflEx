@@ -1,0 +1,61 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:9.0.1'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.3.10'
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 34
+    namespace "com.csr.c4w2a2"
+
+    defaultConfig {
+        minSdkVersion 31
+        targetSdkVersion 34
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        mlModelBinding true
+        viewBinding true
+    }
+}
+
+dependencies {
+    //noinspection Aligned16KB
+    implementation 'org.tensorflow:tensorflow-lite:2.17.0'
+    implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:2.16.1'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.5.0'
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.17.0'
+    implementation 'org.tensorflow:tensorflow-lite-gpu-api:2.17.0'
+    implementation 'androidx.annotation:annotation:1.9.1'
+}

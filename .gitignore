@@ -1,0 +1,9 @@
+local.properties
+build/
+gradle/gradle-daemon-jvm.properties
+gradle/wrapper/gradle-wrapper.jar
+gradlew
+gradlew.bat
+*.iml
+.*
+!.gitignore
